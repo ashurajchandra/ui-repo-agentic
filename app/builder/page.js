@@ -7,6 +7,7 @@ import {
   parseOptions,
   removeField,
   updateField,
+  moveField,
 } from "../../lib/form-fields.js";
 
 export default function BuilderPage() {
@@ -26,6 +27,10 @@ export default function BuilderPage() {
 
   function handleRemoveField(id) {
     setFields((current) => removeField(current, id));
+  }
+
+  function handleMoveField(id, direction) {
+    setFields((current) => moveField(current, id, direction));
   }
 
   return (
@@ -53,58 +58,79 @@ export default function BuilderPage() {
         <section>
           <h2>Configuration</h2>
           <div data-testid="field-list" style={{ display: "flex", flexDirection: "col", gap: "1.5rem" }}>
-            {fields.map((field) => (
-              <div
-                key={field.id}
-                style={{
-                  border: "1px solid #ccc",
-                  padding: "1rem",
-                  borderRadius: "4px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.5rem",
-                  width: "100%",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontWeight: "bold", textTransform: "capitalize" }}>
-                    {field.type} Field
-                  </span>
-                  <button
-                    data-testid="remove-field"
-                    onClick={() => handleRemoveField(field.id)}
-                    style={{ color: "red" }}
-                  >
-                    Remove
-                  </button>
-                </div>
+            {fields.map((field, index) => {
+              const effectiveLabel = getEffectiveLabel(field.label, field.type);
+              return (
+                <div
+                  key={field.id}
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "1rem",
+                    borderRadius: "4px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.5rem",
+                    width: "100%",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontWeight: "bold", textTransform: "capitalize" }}>
+                      {field.type} Field
+                    </span>
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      <button
+                        data-testid="move-up"
+                        disabled={index === 0}
+                        aria-label={`Move ${effectiveLabel} up`}
+                        onClick={() => handleMoveField(field.id, "up")}
+                      >
+                        Move up
+                      </button>
+                      <button
+                        data-testid="move-down"
+                        disabled={index === fields.length - 1}
+                        aria-label={`Move ${effectiveLabel} down`}
+                        onClick={() => handleMoveField(field.id, "down")}
+                      >
+                        Move down
+                      </button>
+                      <button
+                        data-testid="remove-field"
+                        onClick={() => handleRemoveField(field.id)}
+                        style={{ color: "red" }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
 
-                <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <span>Field Label:</span>
-                  <input
-                    type="text"
-                    data-testid="field-label"
-                    value={field.label}
-                    maxLength={60}
-                    onChange={(e) => handleUpdateLabel(field.id, e.target.value)}
-                    style={{ padding: "4px", width: "100%" }}
-                  />
-                </label>
-
-                {field.type === "dropdown" && (
                   <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <span>Dropdown Options (one per line):</span>
-                    <textarea
-                      rows={4}
-                      value={field.options}
-                      onChange={(e) => handleUpdateOptions(field.id, e.target.value)}
-                      placeholder="Option 1&#10;Option 2"
+                    <span>Field Label:</span>
+                    <input
+                      type="text"
+                      data-testid="field-label"
+                      value={field.label}
+                      maxLength={60}
+                      onChange={(e) => handleUpdateLabel(field.id, e.target.value)}
                       style={{ padding: "4px", width: "100%" }}
                     />
                   </label>
-                )}
-              </div>
-            ))}
+
+                  {field.type === "dropdown" && (
+                    <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                      <span>Dropdown Options (one per line):</span>
+                      <textarea
+                        rows={4}
+                        value={field.options}
+                        onChange={(e) => handleUpdateOptions(field.id, e.target.value)}
+                        placeholder="Option 1&#10;Option 2"
+                        style={{ padding: "4px", width: "100%" }}
+                      />
+                    </label>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
 
