@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "stack": "next",
+  "scripts": { "test": "test", "build": "build", "start": "start" },
+  "port": 3000,
+  "readyPath": "/",
+  "database": { "kind": "none" }
+}
