@@ -9,9 +9,13 @@ import {
   updateField,
   moveField,
 } from "../../lib/form-fields.js";
+import { exportForm, importForm } from "../../lib/form-json.js";
 
 export default function BuilderPage() {
   const [fields, setFields] = useState([]);
+  const [exportText, setExportText] = useState("");
+  const [importText, setImportText] = useState("");
+  const [importError, setImportError] = useState("");
 
   function handleAddField(type) {
     setFields((current) => addField(current, type));
@@ -31,6 +35,21 @@ export default function BuilderPage() {
 
   function handleMoveField(id, direction) {
     setFields((current) => moveField(current, id, direction));
+  }
+
+  function handleExport() {
+    const output = exportForm(fields);
+    setExportText(output);
+  }
+
+  function handleImport() {
+    try {
+      const imported = importForm(importText);
+      setFields(imported);
+      setImportError("");
+    } catch (err) {
+      setImportError(err.message);
+    }
   }
 
   return (
@@ -57,7 +76,7 @@ export default function BuilderPage() {
         {/* Configuration Panel */}
         <section>
           <h2>Configuration</h2>
-          <div data-testid="field-list" style={{ display: "flex", flexDirection: "col", gap: "1.5rem" }}>
+          <div data-testid="field-list" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             {fields.map((field, index) => {
               const effectiveLabel = getEffectiveLabel(field.label, field.type);
               return (
@@ -188,6 +207,52 @@ export default function BuilderPage() {
           </div>
         </section>
       </div>
+
+      {/* Import / Export Section */}
+      <section style={{ marginTop: "3rem", borderTop: "1px solid #ddd", paddingTop: "2rem" }}>
+        <h2>Import / Export Form</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem" }}>
+          {/* Export */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <h3>Export</h3>
+            <button data-testid="export-button" onClick={handleExport} style={{ padding: "8px 16px", alignSelf: "flex-start" }}>
+              Export
+            </button>
+            <textarea
+              data-testid="export-output"
+              readOnly
+              value={exportText}
+              rows={10}
+              placeholder="Exported JSON will appear here"
+              style={{ width: "100%", fontFamily: "monospace", padding: "8px", boxSizing: "border-box" }}
+            />
+          </div>
+
+          {/* Import */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <h3>Import</h3>
+            <textarea
+              data-testid="import-input"
+              value={importText}
+              onChange={(e) => setImportText(e.target.value)}
+              rows={10}
+              placeholder="Paste JSON here to import"
+              style={{ width: "100%", fontFamily: "monospace", padding: "8px", boxSizing: "border-box" }}
+            />
+            <button data-testid="import-button" onClick={handleImport} style={{ padding: "8px 16px", alignSelf: "flex-start" }}>
+              Import form
+            </button>
+            {importError && (
+              <div
+                data-testid="import-error"
+                style={{ color: "red", fontWeight: "bold", padding: "8px", border: "1px solid red", borderRadius: "4px", backgroundColor: "#fff5f5" }}
+              >
+                {importError}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
