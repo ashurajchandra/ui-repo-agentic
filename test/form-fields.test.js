@@ -8,6 +8,7 @@ import {
   parseOptions,
   removeField,
   updateField,
+  moveField,
 } from "../lib/form-fields.js";
 
 test("getDefaultLabel returns standard defaults", () => {
@@ -59,4 +60,55 @@ test("addField, removeField, and updateField manage field list state immutably",
   fields = removeField(fields, 1);
   assert.equal(fields.length, 1);
   assert.equal(fields[0].id, 2);
+});
+
+test("moveField moves fields up and down correctly and handles edge cases immutably", () => {
+  const fields = [
+    { id: 1, type: "text", label: "Label 1" },
+    { id: 2, type: "email", label: "Label 2" },
+    { id: 3, type: "checkbox", label: "Label 3" },
+  ];
+
+  // 1. Move up (normal movement)
+  const movedUp = moveField(fields, 2, "up");
+  assert.deepEqual(movedUp, [
+    { id: 2, type: "email", label: "Label 2" },
+    { id: 1, type: "text", label: "Label 1" },
+    { id: 3, type: "checkbox", label: "Label 3" },
+  ]);
+
+  // Immutability check for normal move up
+  assert.notEqual(movedUp, fields);
+  assert.deepEqual(fields, [
+    { id: 1, type: "text", label: "Label 1" },
+    { id: 2, type: "email", label: "Label 2" },
+    { id: 3, type: "checkbox", label: "Label 3" },
+  ]);
+
+  // 2. Move down (normal movement)
+  const movedDown = moveField(fields, 2, "down");
+  assert.deepEqual(movedDown, [
+    { id: 1, type: "text", label: "Label 1" },
+    { id: 3, type: "checkbox", label: "Label 3" },
+    { id: 2, type: "email", label: "Label 2" },
+  ]);
+
+  // Immutability check for normal move down
+  assert.notEqual(movedDown, fields);
+
+  // 3. Boundary limits: Move up on first element
+  const movedFirstUp = moveField(fields, 1, "up");
+  assert.deepEqual(movedFirstUp, fields); // unchanged
+
+  // 4. Boundary limits: Move down on last element
+  const movedLastDown = moveField(fields, 3, "down");
+  assert.deepEqual(movedLastDown, fields); // unchanged
+
+  // 5. Unknown IDs
+  const unknownIdMove = moveField(fields, 999, "up");
+  assert.deepEqual(unknownIdMove, fields); // unchanged
+
+  // 6. Invalid direction
+  const invalidDirMove = moveField(fields, 2, "invalid");
+  assert.deepEqual(invalidDirMove, fields); // unchanged
 });
