@@ -10,12 +10,17 @@ import {
   moveField,
 } from "../../lib/form-fields.js";
 import { exportForm, importForm } from "../../lib/form-json.js";
+import { reorder } from "../../lib/reorder.js";
 
 export default function BuilderPage() {
   const [fields, setFields] = useState([]);
   const [exportText, setExportText] = useState("");
   const [importText, setImportText] = useState("");
   const [importError, setImportError] = useState("");
+
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [canDrag, setCanDrag] = useState(false);
 
   function handleAddField(type) {
     setFields((current) => addField(current, type));
@@ -52,6 +57,40 @@ export default function BuilderPage() {
     }
   }
 
+  // HTML5 DnD event handlers
+  function handleDragStart(e, index) {
+    if (!canDrag) {
+      e.preventDefault();
+      return;
+    }
+    e.dataTransfer.effectAllowed = "move";
+    setDraggedIndex(index);
+  }
+
+  function handleDragOver(e, index) {
+    e.preventDefault();
+    if (draggedIndex === null) return;
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  }
+
+  function handleDragEnd() {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    setCanDrag(false);
+  }
+
+  function handleDrop(e, index) {
+    e.preventDefault();
+    if (draggedIndex !== null && draggedIndex !== index) {
+      setFields((current) => reorder(current, draggedIndex, index));
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    setCanDrag(false);
+  }
+
   return (
     <main style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: "1200px", margin: "0 auto" }}>
       <h1>Form Builder</h1>
@@ -79,23 +118,59 @@ export default function BuilderPage() {
           <div data-testid="field-list" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             {fields.map((field, index) => {
               const effectiveLabel = getEffectiveLabel(field.label, field.type);
+              const isDragging = draggedIndex === index;
+              const isDragOver = dragOverIndex === index && draggedIndex !== index;
+
               return (
                 <div
                   key={field.id}
+                  draggable={canDrag}
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragEnd={handleDragEnd}
+                  onDrop={(e) => handleDrop(e, index)}
                   style={{
-                    border: "1px solid #ccc",
+                    border: isDragOver ? "2px dashed #0070f3" : "1px solid #ccc",
+                    backgroundColor: isDragOver ? "#f0f7ff" : "transparent",
+                    opacity: isDragging ? 0.5 : 1,
+                    boxShadow: isDragging ? "0 4px 12px rgba(0,0,0,0.15)" : "none",
                     padding: "1rem",
                     borderRadius: "4px",
                     display: "flex",
                     flexDirection: "column",
                     gap: "0.5rem",
                     width: "100%",
+                    transition: "all 0.2s ease",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: "bold", textTransform: "capitalize" }}>
-                      {field.type} Field
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span
+                        data-testid="drag-handle"
+                        aria-label="Drag to reorder"
+                        role="button"
+                        tabIndex={0}
+                        onMouseDown={() => setCanDrag(true)}
+                        onMouseUp={() => setCanDrag(false)}
+                        onTouchStart={() => setCanDrag(true)}
+                        onTouchEnd={() => setCanDrag(false)}
+                        style={{
+                          cursor: "grab",
+                          userSelect: "none",
+                          padding: "4px 8px",
+                          border: "1px solid #ccc",
+                          borderRadius: "4px",
+                          backgroundColor: "#f5f5f5",
+                          fontSize: "1.2rem",
+                          lineHeight: "1"
+                        }}
+                      >
+                        ☰
+                      </span>
+                      <span style={{ fontWeight: "bold", textTransform: "capitalize" }}>
+                        {field.type} Field
+                      </span>
+                    </div>
                     <div style={{ display: "flex", gap: "0.5rem" }}>
                       <button
                         data-testid="move-up"
