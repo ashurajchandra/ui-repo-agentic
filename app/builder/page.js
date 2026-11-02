@@ -85,6 +85,7 @@ export default function BuilderPage() {
     }
   }
 
+  // Drag end
   function handleDragEnd() {
     setDraggedIndex(null);
     setDragOverIndex(null);
@@ -102,7 +103,7 @@ export default function BuilderPage() {
   }
 
   return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: "1200px", margin: "0 auto" }}>
+    <main className="builder-main">
       <h1>Form Builder</h1>
       
       {/* Toolbar */}
@@ -121,7 +122,7 @@ export default function BuilderPage() {
         </button>
       </section>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+      <div className="builder-grid">
         {/* Configuration Panel */}
         <section>
           <h2>Configuration</h2>
@@ -153,7 +154,7 @@ export default function BuilderPage() {
                     transition: "all 0.2s ease",
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div className="field-card-header">
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                       <span
                         data-testid="drag-handle"
@@ -181,7 +182,7 @@ export default function BuilderPage() {
                         {field.type} Field
                       </span>
                     </div>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <div className="field-card-actions">
                       <button
                         data-testid="move-up"
                         disabled={index === 0}
@@ -259,12 +260,7 @@ export default function BuilderPage() {
           <h2>Live Preview</h2>
           <div
             data-testid="preview"
-            style={{
-              border: "2px dashed #999",
-              padding: "2rem",
-              borderRadius: "8px",
-              minHeight: "200px",
-            }}
+            className="builder-preview"
           >
             {fields.length === 0 ? (
               <p>No fields yet</p>
