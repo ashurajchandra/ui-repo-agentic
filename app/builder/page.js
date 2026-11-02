@@ -8,6 +8,7 @@ import {
   removeField,
   updateField,
   moveField,
+  duplicateField,
 } from "../../lib/form-fields.js";
 import { exportForm, importForm } from "../../lib/form-json.js";
 import { reorder } from "../../lib/reorder.js";
@@ -42,6 +43,10 @@ export default function BuilderPage() {
     setFields((current) => moveField(current, id, direction));
   }
 
+  function handleDuplicateField(id) {
+    setFields((current) => duplicateField(current, id));
+  }
+
   function handleExport() {
     const output = exportForm(fields);
     setExportText(output);
@@ -67,6 +72,7 @@ export default function BuilderPage() {
     setDraggedIndex(index);
   }
 
+  // Drag over handler
   function handleDragOver(e, index) {
     e.preventDefault();
     if (draggedIndex === null) return;
@@ -187,6 +193,12 @@ export default function BuilderPage() {
                         onClick={() => handleMoveField(field.id, "down")}
                       >
                         Move down
+                      </button>
+                      <button
+                        data-testid="duplicate-field"
+                        onClick={() => handleDuplicateField(field.id)}
+                      >
+                        Duplicate
                       </button>
                       <button
                         data-testid="remove-field"

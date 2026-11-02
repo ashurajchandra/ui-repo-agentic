@@ -9,6 +9,7 @@ import {
   removeField,
   updateField,
   moveField,
+  duplicateField,
 } from "../lib/form-fields.js";
 
 test("getDefaultLabel returns standard defaults", () => {
@@ -111,4 +112,34 @@ test("moveField moves fields up and down correctly and handles edge cases immuta
   // 6. Invalid direction
   const invalidDirMove = moveField(fields, 2, "invalid");
   assert.deepEqual(invalidDirMove, fields); // unchanged
+});
+
+test("duplicateField replicates fields correctly and maintains positioning immutably", () => {
+  const fields = [
+    { id: 1, type: "text", label: "Label 1", options: "" },
+    { id: 4, type: "dropdown", label: "Label 2", options: "Opt1\nOpt2" },
+    { id: 3, type: "checkbox", label: "Label 3", options: "" },
+  ];
+
+  // Duplicate a middle field
+  const duplicatedMiddle = duplicateField(fields, 4);
+  assert.equal(duplicatedMiddle.length, 4);
+  assert.deepEqual(duplicatedMiddle[1], { id: 4, type: "dropdown", label: "Label 2", options: "Opt1\nOpt2" });
+  assert.deepEqual(duplicatedMiddle[2], { id: 5, type: "dropdown", label: "Label 2 (copy)", options: "Opt1\nOpt2" });
+  assert.deepEqual(duplicatedMiddle[3], { id: 3, type: "checkbox", label: "Label 3", options: "" });
+
+  // Immutability: check that original fields array is unchanged
+  assert.notEqual(duplicatedMiddle, fields);
+  assert.equal(fields.length, 3);
+  assert.equal(fields[1].label, "Label 2");
+
+  // Duplicate the last field in the list
+  const duplicatedLast = duplicateField(fields, 3);
+  assert.equal(duplicatedLast.length, 4);
+  assert.deepEqual(duplicatedLast[2], { id: 3, type: "checkbox", label: "Label 3", options: "" });
+  assert.deepEqual(duplicatedLast[3], { id: 5, type: "checkbox", label: "Label 3 (copy)", options: "" });
+
+  // Handle missing/unknown id
+  const duplicatedUnknown = duplicateField(fields, 999);
+  assert.deepEqual(duplicatedUnknown, fields);
 });
