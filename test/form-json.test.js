@@ -122,3 +122,38 @@ test("failure scenario: zero options dropdowns", () => {
   });
   assert.throws(() => importForm(payloadOnlyWhitespace), /Dropdown fields cannot have zero options/);
 });
+
+test("required state: import and export with required states, and fallback when missing", () => {
+  // 1. Check export keeps required boolean states
+  const fields = [
+    { id: 1, type: "text", label: "Field A", required: true },
+    { id: 2, type: "checkbox", label: "Field B", required: false },
+    { id: 3, type: "email", label: "Field C" } // missing required key, should default to false in export
+  ];
+  
+  const exported = exportForm(fields);
+  const parsed = JSON.parse(exported);
+  
+  assert.equal(parsed.fields[0].required, true);
+  assert.equal(parsed.fields[1].required, false);
+  assert.equal(parsed.fields[2].required, false);
+  
+  // 2. Check import preserves/restores required state
+  const imported = importForm(exported);
+  assert.equal(imported[0].required, true);
+  assert.equal(imported[1].required, false);
+  assert.equal(imported[2].required, false);
+  
+  // 3. Check fallback: JSON completely missing 'required' keys defaults to false
+  const jsonMissingRequired = JSON.stringify({
+    version: 1,
+    fields: [
+      { id: 10, type: "text", label: "No Required field A" },
+      { id: 20, type: "email", label: "No Required field B" }
+    ]
+  });
+  
+  const importedMissing = importForm(jsonMissingRequired);
+  assert.equal(importedMissing[0].required, false);
+  assert.equal(importedMissing[1].required, false);
+});

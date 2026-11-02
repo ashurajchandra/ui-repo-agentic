@@ -31,6 +31,10 @@ export default function BuilderPage() {
     setFields((current) => updateField(current, id, { label }));
   }
 
+  function handleUpdateRequired(id, required) {
+    setFields((current) => updateField(current, id, { required }));
+  }
+
   function handleUpdateOptions(id, options) {
     setFields((current) => updateField(current, id, { options }));
   }
@@ -222,6 +226,16 @@ export default function BuilderPage() {
                     />
                   </label>
 
+                  <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <input
+                      type="checkbox"
+                      data-testid="field-required"
+                      checked={!!field.required}
+                      onChange={(e) => handleUpdateRequired(field.id, e.target.checked)}
+                    />
+                    <span>Required</span>
+                  </label>
+
                   {field.type === "dropdown" && (
                     <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                       <span>Dropdown Options (one per line):</span>
@@ -264,11 +278,17 @@ export default function BuilderPage() {
                       {field.type === "checkbox" ? (
                         <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                           <input type="checkbox" />
-                          <span>{effectiveLabel}</span>
+                          <span>
+                            {effectiveLabel}
+                            {field.required && <span style={{ color: "red" }}> *</span>}
+                          </span>
                         </label>
                       ) : (
                         <>
-                          <label style={{ fontWeight: "600" }}>{effectiveLabel}</label>
+                          <label style={{ fontWeight: "600" }}>
+                            {effectiveLabel}
+                            {field.required && <span style={{ color: "red" }}> *</span>}
+                          </label>
                           {field.type === "text" && (
                             <input type="text" style={{ padding: "6px", width: "100%" }} />
                           )}
