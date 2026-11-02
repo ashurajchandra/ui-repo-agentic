@@ -46,16 +46,19 @@ test("addField, removeField, and updateField manage field list state immutably",
   assert.equal(fields[0].id, 1);
   assert.equal(fields[0].type, "text");
   assert.equal(fields[0].label, "Untitled text");
+  assert.equal(fields[0].required, false);
 
   // Add another field
   fields = addField(fields, "dropdown");
   assert.equal(fields.length, 2);
   assert.equal(fields[1].id, 2);
   assert.equal(fields[1].type, "dropdown");
+  assert.equal(fields[1].required, false);
 
   // Update field
-  fields = updateField(fields, 1, { label: "My Custom Label" });
+  fields = updateField(fields, 1, { label: "My Custom Label", required: true });
   assert.equal(fields[0].label, "My Custom Label");
+  assert.equal(fields[0].required, true);
 
   // Remove field
   fields = removeField(fields, 1);
@@ -65,33 +68,33 @@ test("addField, removeField, and updateField manage field list state immutably",
 
 test("moveField moves fields up and down correctly and handles edge cases immutably", () => {
   const fields = [
-    { id: 1, type: "text", label: "Label 1" },
-    { id: 2, type: "email", label: "Label 2" },
-    { id: 3, type: "checkbox", label: "Label 3" },
+    { id: 1, type: "text", label: "Label 1", required: true },
+    { id: 2, type: "email", label: "Label 2", required: false },
+    { id: 3, type: "checkbox", label: "Label 3", required: true },
   ];
 
   // 1. Move up (normal movement)
   const movedUp = moveField(fields, 2, "up");
   assert.deepEqual(movedUp, [
-    { id: 2, type: "email", label: "Label 2" },
-    { id: 1, type: "text", label: "Label 1" },
-    { id: 3, type: "checkbox", label: "Label 3" },
+    { id: 2, type: "email", label: "Label 2", required: false },
+    { id: 1, type: "text", label: "Label 1", required: true },
+    { id: 3, type: "checkbox", label: "Label 3", required: true },
   ]);
 
   // Immutability check for normal move up
   assert.notEqual(movedUp, fields);
   assert.deepEqual(fields, [
-    { id: 1, type: "text", label: "Label 1" },
-    { id: 2, type: "email", label: "Label 2" },
-    { id: 3, type: "checkbox", label: "Label 3" },
+    { id: 1, type: "text", label: "Label 1", required: true },
+    { id: 2, type: "email", label: "Label 2", required: false },
+    { id: 3, type: "checkbox", label: "Label 3", required: true },
   ]);
 
   // 2. Move down (normal movement)
   const movedDown = moveField(fields, 2, "down");
   assert.deepEqual(movedDown, [
-    { id: 1, type: "text", label: "Label 1" },
-    { id: 3, type: "checkbox", label: "Label 3" },
-    { id: 2, type: "email", label: "Label 2" },
+    { id: 1, type: "text", label: "Label 1", required: true },
+    { id: 3, type: "checkbox", label: "Label 3", required: true },
+    { id: 2, type: "email", label: "Label 2", required: false },
   ]);
 
   // Immutability check for normal move down
@@ -116,17 +119,17 @@ test("moveField moves fields up and down correctly and handles edge cases immuta
 
 test("duplicateField replicates fields correctly and maintains positioning immutably", () => {
   const fields = [
-    { id: 1, type: "text", label: "Label 1", options: "" },
-    { id: 4, type: "dropdown", label: "Label 2", options: "Opt1\nOpt2" },
-    { id: 3, type: "checkbox", label: "Label 3", options: "" },
+    { id: 1, type: "text", label: "Label 1", options: "", required: true },
+    { id: 4, type: "dropdown", label: "Label 2", options: "Opt1\nOpt2", required: false },
+    { id: 3, type: "checkbox", label: "Label 3", options: "", required: true },
   ];
 
   // Duplicate a middle field
   const duplicatedMiddle = duplicateField(fields, 4);
   assert.equal(duplicatedMiddle.length, 4);
-  assert.deepEqual(duplicatedMiddle[1], { id: 4, type: "dropdown", label: "Label 2", options: "Opt1\nOpt2" });
-  assert.deepEqual(duplicatedMiddle[2], { id: 5, type: "dropdown", label: "Label 2 (copy)", options: "Opt1\nOpt2" });
-  assert.deepEqual(duplicatedMiddle[3], { id: 3, type: "checkbox", label: "Label 3", options: "" });
+  assert.deepEqual(duplicatedMiddle[1], { id: 4, type: "dropdown", label: "Label 2", options: "Opt1\nOpt2", required: false });
+  assert.deepEqual(duplicatedMiddle[2], { id: 5, type: "dropdown", label: "Label 2 (copy)", options: "Opt1\nOpt2", required: false });
+  assert.deepEqual(duplicatedMiddle[3], { id: 3, type: "checkbox", label: "Label 3", options: "", required: true });
 
   // Immutability: check that original fields array is unchanged
   assert.notEqual(duplicatedMiddle, fields);
@@ -136,8 +139,8 @@ test("duplicateField replicates fields correctly and maintains positioning immut
   // Duplicate the last field in the list
   const duplicatedLast = duplicateField(fields, 3);
   assert.equal(duplicatedLast.length, 4);
-  assert.deepEqual(duplicatedLast[2], { id: 3, type: "checkbox", label: "Label 3", options: "" });
-  assert.deepEqual(duplicatedLast[3], { id: 5, type: "checkbox", label: "Label 3 (copy)", options: "" });
+  assert.deepEqual(duplicatedLast[2], { id: 3, type: "checkbox", label: "Label 3", options: "", required: true });
+  assert.deepEqual(duplicatedLast[3], { id: 5, type: "checkbox", label: "Label 3 (copy)", options: "", required: true });
 
   // Handle missing/unknown id
   const duplicatedUnknown = duplicateField(fields, 999);
