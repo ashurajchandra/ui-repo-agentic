@@ -146,3 +146,41 @@ test("duplicateField replicates fields correctly and maintains positioning immut
   const duplicatedUnknown = duplicateField(fields, 999);
   assert.deepEqual(duplicatedUnknown, fields);
 });
+
+test("duplicateField performs deep copying of options and handles complex nested option structure", () => {
+  const fields = [
+    { id: 1, type: "dropdown", label: "My Dropdown", options: { list: ["A", "B"], meta: { count: 2 } }, required: false }
+  ];
+  const duplicated = duplicateField(fields, 1);
+  assert.equal(duplicated.length, 2);
+  
+  // Modify original's options
+  fields[0].options.list.push("C");
+  fields[0].options.meta.count = 3;
+
+  // The copy's options should not be mutated
+  assert.deepEqual(duplicated[1].options, { list: ["A", "B"], meta: { count: 2 } });
+});
+
+test("duplicateField handles incrementing label numbers when label is already in use", () => {
+  const fields = [
+    { id: 1, type: "text", label: "Feedback", required: false },
+    { id: 2, type: "text", label: "Feedback (copy)", required: false },
+    { id: 3, type: "text", label: "Feedback (copy 2)", required: false },
+    { id: 4, type: "text", label: "Feedback (copy 3)", required: false }
+  ];
+
+  const duplicated = duplicateField(fields, 1);
+  // It should find "Feedback (copy 4)" as the first unused candidate
+  assert.equal(duplicated[1].label, "Feedback (copy 4)");
+
+  // Another test case: if some middle copies are missing
+  const fields2 = [
+    { id: 1, type: "text", label: "Name", required: false },
+    { id: 2, type: "text", label: "Name (copy 3)", required: false }
+  ];
+  const duplicated2 = duplicateField(fields2, 1);
+  // It should use "Name (copy)" since that's not in use!
+  assert.equal(duplicated2[1].label, "Name (copy)");
+});
+
