@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   addField,
   getEffectiveLabel,
@@ -15,6 +15,7 @@ import { reorder } from "../../lib/reorder.js";
 
 export default function BuilderPage() {
   const [fields, setFields] = useState([]);
+  const [focusedFieldId, setFocusedFieldId] = useState(null);
   const [exportText, setExportText] = useState("");
   const [importText, setImportText] = useState("");
   const [importError, setImportError] = useState("");
@@ -48,8 +49,26 @@ export default function BuilderPage() {
   }
 
   function handleDuplicateField(id) {
-    setFields((current) => duplicateField(current, id));
+    const nextId = fields.reduce((highest, f) => Math.max(highest, f.id), 0) + 1;
+    setFields((current) => {
+      const result = duplicateField(current, id);
+      if (result.length > current.length) {
+        setFocusedFieldId(nextId);
+      }
+      return result;
+    });
   }
+
+  useEffect(() => {
+    if (focusedFieldId !== null) {
+      const element = document.getElementById(`field-label-${focusedFieldId}`);
+      if (element) {
+        element.focus();
+        element.select();
+        setFocusedFieldId(null);
+      }
+    }
+  }, [focusedFieldId, fields]);
 
   function handleExport() {
     const output = exportForm(fields);
@@ -121,7 +140,20 @@ export default function BuilderPage() {
         </button>
       </section>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+      <style>{`
+        .builder-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+        }
+        @media (max-width: 768px) {
+          .builder-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <div className="builder-grid">
         {/* Configuration Panel */}
         <section>
           <h2>Configuration</h2>
@@ -181,7 +213,7 @@ export default function BuilderPage() {
                         {field.type} Field
                       </span>
                     </div>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                       <button
                         data-testid="move-up"
                         disabled={index === 0}
@@ -217,6 +249,7 @@ export default function BuilderPage() {
                   <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     <span>Field Label:</span>
                     <input
+                      id={`field-label-${field.id}`}
                       type="text"
                       data-testid="field-label"
                       value={field.label}
