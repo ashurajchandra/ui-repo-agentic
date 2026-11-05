@@ -22,3 +22,31 @@ test("toggles and removes by id, and counts what is left", () => {
   assert.equal(remaining(toggled), 1);
   assert.deepEqual(removeTodo(toggled, 1).map((todo) => todo.id), [2]);
 });
+
+test("marking a task as completed leaves it in the list retaining status", () => {
+  const initialTodos = [
+    { id: 1, title: "Task 1", done: false },
+    { id: 2, title: "Task 2", done: false }
+  ];
+  const updatedTodos = toggleTodo(initialTodos, 1);
+  
+  // Completed item is still in the array
+  assert.equal(updatedTodos.length, 2);
+  const task1 = updatedTodos.find(t => t.id === 1);
+  assert.ok(task1);
+  assert.equal(task1.done, true);
+});
+
+test("deleting a task completely removes/purges it from the state array", () => {
+  const initialTodos = [
+    { id: 1, title: "Task 1", done: false },
+    { id: 2, title: "Task 2", done: false }
+  ];
+  const updatedTodos = removeTodo(initialTodos, 1);
+  
+  // Deleted item is completely removed from the array
+  assert.equal(updatedTodos.length, 1);
+  const task1 = updatedTodos.find(t => t.id === 1);
+  assert.equal(task1, undefined);
+});
+
