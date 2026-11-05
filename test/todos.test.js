@@ -22,3 +22,33 @@ test("toggles and removes by id, and counts what is left", () => {
   assert.equal(remaining(toggled), 1);
   assert.deepEqual(removeTodo(toggled, 1).map((todo) => todo.id), [2]);
 });
+
+test("exact differentiation between completed tasks and deleted tasks", () => {
+  const initialTodos = [
+    { id: 1, title: "Task 1", done: false },
+    { id: 2, title: "Task 2", done: false }
+  ];
+
+  // 1. Mark Task 1 as completed (toggled)
+  const completedTodos = toggleTodo(initialTodos, 1);
+  
+  // Completed tasks must remain in the list/state
+  assert.equal(completedTodos.length, 2, "Completed task should remain in the list");
+  assert.deepEqual(
+    completedTodos.find((t) => t.id === 1),
+    { id: 1, title: "Task 1", done: true },
+    "Completed task should have its done state set to true"
+  );
+  
+  // 2. Delete Task 2
+  const deletedTodos = removeTodo(completedTodos, 2);
+  
+  // Deleted tasks must be completely purged from the application state
+  assert.equal(deletedTodos.length, 1, "Deleted task should be removed from the list");
+  assert.equal(deletedTodos.find((t) => t.id === 2), undefined, "Deleted task should not exist in the list");
+  assert.deepEqual(
+    deletedTodos,
+    [{ id: 1, title: "Task 1", done: true }],
+    "List should only contain the remaining tasks (even if completed)"
+  );
+});
