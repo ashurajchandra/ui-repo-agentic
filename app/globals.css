@@ -12,13 +12,86 @@ body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 syst
 main { max-width: 36rem; margin: 0 auto; padding: 2rem 1rem; }
 h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
 .muted { color: var(--muted); margin: 0 0 1.25rem; }
-form { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+form { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
 input[type="text"] { flex: 1; min-width: 0; padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+input[type="date"] { padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+.due-form-label { color: var(--muted); font-size: 0.9rem; }
 button { padding: 0.6rem 0.9rem; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font: inherit; cursor: pointer; }
 button.link { background: none; color: var(--muted); padding: 0.3rem 0.5rem; }
 ul { list-style: none; margin: 0; padding: 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
 li { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line); }
 li:last-child { border-bottom: 0; }
 li label { flex: 1; }
-li.done label span { text-decoration: line-through; color: var(--muted); }
+li.done label span.todo-title { text-decoration: line-through; color: var(--muted); }
 .empty { padding: 1rem; color: var(--muted); }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.5rem;
+}
+.tabs button {
+  background: none;
+  color: var(--muted);
+  border: 1px solid transparent;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+}
+.tabs button:hover {
+  background: var(--bg);
+}
+.tabs button.active-tab, .tabs button[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Todo Label & Due Date Label */
+.todo-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+}
+.todo-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+.todo-title {
+  font-weight: 500;
+}
+.due-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: var(--bg);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+.due-label.overdue {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+@media (max-width: 480px) {
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .tabs button {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  .todo-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+}
