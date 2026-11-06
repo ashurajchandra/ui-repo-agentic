@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { addTodo, MAX_TITLE, remaining, removeTodo, toggleTodo } from "../lib/todos.js";
+import { addTodo, MAX_TITLE, remaining, removeTodo, toggleTodo, markDoneBulk, deleteBulk } from "../lib/todos.js";
 
 test("adds a todo with the next id and trims the title", () => {
   const todos = addTodo(addTodo([], "  Buy milk "), "Call Sam");
@@ -22,3 +22,30 @@ test("toggles and removes by id, and counts what is left", () => {
   assert.equal(remaining(toggled), 1);
   assert.deepEqual(removeTodo(toggled, 1).map((todo) => todo.id), [2]);
 });
+
+test("markDoneBulk marks selected todos as done", () => {
+  const todos = [
+    { id: 1, title: "a", done: false },
+    { id: 2, title: "b", done: false },
+    { id: 3, title: "c", done: false }
+  ];
+  const updated = markDoneBulk(todos, [1, 3]);
+  assert.deepEqual(updated, [
+    { id: 1, title: "a", done: true },
+    { id: 2, title: "b", done: false },
+    { id: 3, title: "c", done: true }
+  ]);
+});
+
+test("deleteBulk deletes selected todos", () => {
+  const todos = [
+    { id: 1, title: "a", done: false },
+    { id: 2, title: "b", done: false },
+    { id: 3, title: "c", done: false }
+  ];
+  const updated = deleteBulk(todos, [1, 3]);
+  assert.deepEqual(updated, [
+    { id: 2, title: "b", done: false }
+  ]);
+});
+
