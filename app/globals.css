@@ -22,3 +22,39 @@ li:last-child { border-bottom: 0; }
 li label { flex: 1; }
 li.done label span { text-decoration: line-through; color: var(--muted); }
 .empty { padding: 1rem; color: var(--muted); }
+
+/* Dialogs */
+dialog.todo-dialog {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--text);
+  padding: 1.5rem;
+  max-width: 90%;
+  width: 450px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+dialog.todo-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+dialog h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+.reorder-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Responsive styling */
+@media (max-width: 390px) {
+  dialog.todo-dialog {
+    width: 100%;
+    margin: 1rem;
+    padding: 1rem;
+  }
+  li {
+    flex-wrap: wrap;
+  }
+}
