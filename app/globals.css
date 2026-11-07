@@ -5,6 +5,7 @@
   --muted: #5b6575;
   --line: #dde1e8;
   --accent: #2f5fd0;
+  --error: #df3d3d;
   color-scheme: light;
 }
 * { box-sizing: border-box; }
@@ -20,5 +21,159 @@ ul { list-style: none; margin: 0; padding: 0; background: var(--card); border: 1
 li { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line); }
 li:last-child { border-bottom: 0; }
 li label { flex: 1; }
-li.done label span { text-decoration: line-through; color: var(--muted); }
+li.done label span.todo-title-text { text-decoration: line-through; color: var(--muted); }
 .empty { padding: 1rem; color: var(--muted); }
+
+/* Tabs Row Styling */
+.tabs-row {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.5rem;
+}
+.tab-btn {
+  background: none;
+  color: var(--muted);
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+}
+.tab-btn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+.tab-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Tag Filters Row */
+.tag-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+.tag-filter-chip {
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  border-radius: 100px;
+}
+.tag-filter-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tag-filter-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Todo Label & Badges */
+.todo-label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+.todo-title-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-left: 0.25rem;
+}
+.todo-tag-badge {
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+.todo-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+/* Modal Dialog */
+.tags-dialog {
+  border: 0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: var(--card);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  max-width: 90%;
+  width: 24rem;
+}
+.tags-dialog::backdrop {
+  background: rgba(28, 35, 48, 0.5);
+  backdrop-filter: blur(2px);
+}
+.dialog-content h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.dialog-form label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+.dialog-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+.error-message {
+  color: var(--error);
+  font-size: 0.85rem;
+  margin: 0;
+}
+.dialog-tags-section h3 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  color: var(--muted);
+}
+.dialog-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.dialog-tag-badge {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.remove-tag-btn {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  padding: 0 0.1rem;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.remove-tag-btn:hover {
+  color: var(--error);
+}
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+.done-btn {
+  background: var(--text);
+}
