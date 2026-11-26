@@ -17,8 +17,38 @@ input[type="text"] { flex: 1; min-width: 0; padding: 0.6rem 0.75rem; border: 1px
 button { padding: 0.6rem 0.9rem; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font: inherit; cursor: pointer; }
 button.link { background: none; color: var(--muted); padding: 0.3rem 0.5rem; }
 ul { list-style: none; margin: 0; padding: 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
-li { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line); }
+li { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 li:last-child { border-bottom: 0; }
-li label { flex: 1; }
+li label { flex: 1; min-width: 120px; }
 li.done label span { text-decoration: line-through; color: var(--muted); }
 .empty { padding: 1rem; color: var(--muted); }
+
+.todo-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-move, .btn-remove {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.btn-move {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.btn-move:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
